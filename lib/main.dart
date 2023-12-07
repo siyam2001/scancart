@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scancartpro/onboarding_screen.dart';
-
+import 'package:scancartpro/payment_screen.dart';
 void main() {
   runApp(MyApp());
 }

@@ -46,39 +46,28 @@ class _ProductScannerScreenState extends State<ProductScannerScreen> {
   Future<void> scanProduct() async {
     try {
       if (!_isCameraInitialized) {
-        // Camera not initialized, show an error or log a message
         print('Camera not initialized');
         return;
       }
 
-      // Open the camera API here (you can customize this part based on your needs)
       await _cameraController.startImageStream((CameraImage image) {
-        // Process the camera image as needed
         print('Processing camera image...');
       });
 
-      // Now, you can use the camera API to capture frames, detect barcodes, etc.
-
-      // Stop the camera stream when you're done
-      await _cameraController.stopImageStream();
-
-      // Perform barcode scanning (your existing barcode scanning code)
       String result = await FlutterBarcodeScanner.scanBarcode(
-        '#ff6666', // Scanner overlay color
-        'Cancel',   // Cancel button text
-        true,       // Show flash option
-        ScanMode.DEFAULT, // Scan mode
+        '#ff6666',
+        'Cancel',
+        true,
+        ScanMode.DEFAULT,
       );
 
       if (!mounted) return;
 
       setState(() {
         scannedCode = result ?? 'No result';
-        // Add the scanned item to the cart
         cartItems.add(scannedCode);
       });
 
-      // Navigate to the CartScreen after scanning
       Navigator.push(
         context,
         MaterialPageRoute(

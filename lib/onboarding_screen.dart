@@ -9,14 +9,42 @@ class OnboardingScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Your logo image here
-            Image.asset('assets/fyp_logo.jpeg', height: 100, width: 100),
-            SizedBox(height: 20),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20.0),
+                child: Image.asset(
+                  'assets/fyp_logo.png',
+                  height: 200,
+                  width: 200,
+                ),
+              ),
+            ),
+            SizedBox(height: 40),
             Text(
-              'Get Started',
-              style: TextStyle(fontSize: 20),
+              'Welcome to ScanCartPro',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40.0),
+              child: Text(
+                'Get started by scanning your products with ease!',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
+            SizedBox(height: 40),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -24,7 +52,13 @@ class OnboardingScreen extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => ProductScannerScreen()),
                 );
               },
-              child: Text('Scan a Product'),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                child: Text(
+                  'Scan Your Product',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
             ),
           ],
         ),
