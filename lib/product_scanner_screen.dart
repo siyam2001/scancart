@@ -12,7 +12,7 @@ class _ProductScannerScreenState extends State<ProductScannerScreen> {
   String scannedCode = 'Scan a product';
   late CameraController _cameraController;
   bool _isCameraInitialized = false;
-  List<String> cartItems = [];
+  List<Map<String, dynamic>> cartItems = [];
 
   @override
   void initState() {
@@ -64,14 +64,22 @@ class _ProductScannerScreenState extends State<ProductScannerScreen> {
       if (!mounted) return;
 
       setState(() {
-        scannedCode = result ?? 'No result';
-        cartItems.add(scannedCode);
+        Map<String, dynamic> scannedProduct = {
+          'name': result,
+          'quantity': 1,
+        };
+
+        if (cartItems.isEmpty) {
+          cartItems.add(scannedProduct);
+        } else {
+          cartItems.insert(1, scannedProduct);
+        }
       });
 
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => CartScreen(cartItems: cartItems),
+          builder: (context) => CartScreen(cartItems: cartItems.map((item) => item['name'] as String).toList()),
         ),
       );
     } catch (e) {
@@ -92,29 +100,43 @@ class _ProductScannerScreenState extends State<ProductScannerScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Product Scanner'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.shopping_cart),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      CartScreen(cartItems: cartItems.map((item) => item['name'] as String).toList()),
+                ),
+              );
+            },
+          ),
+        ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            _isCameraInitialized
-                ? AspectRatio(
-              aspectRatio: _cameraController.value.aspectRatio,
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: _isCameraInitialized
+                ? Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
               child: CameraPreview(_cameraController),
             )
                 : Container(),
-            SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: scanProduct,
-              child: Text('Scan Product'),
-            ),
-            SizedBox(height: 20.0),
-            Text(
-              'Scanned Code: $scannedCode',
-              style: TextStyle(fontSize: 16.0),
-            ),
-          ],
-        ),
+          ),
+          SizedBox(height: 20.0),
+          ElevatedButton(
+            onPressed: scanProduct,
+            child: Text('Scan Product'),
+          ),
+          SizedBox(height: 20.0),
+          Text(
+            'Scanned Code: $scannedCode',
+            style: TextStyle(fontSize: 16.0),
+          ),
+        ],
       ),
     );
   }

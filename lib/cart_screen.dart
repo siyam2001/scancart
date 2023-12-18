@@ -12,13 +12,13 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  List<String> cartItems = [];
-  int quantity=0;
+  List<Map<String, dynamic>> cartItems = [];
+  int quantity = 1;
 
   @override
   void initState() {
     super.initState();
-    cartItems = List.from(widget.cartItems);
+    cartItems = widget.cartItems.map((item) => {'name': item, 'quantity': 1}).toList();
   }
 
   void _removeItem(int index) {
@@ -27,32 +27,58 @@ class _CartScreenState extends State<CartScreen> {
     });
   }
 
-  void _increaseQuantity() {
-    // Implement your logic to increase the quantity of the item at the given index
-    quantity++;
-    print("quantity$quantity");
-
-  }
-
-  void _decreaseQuantity(int index) {
-    // Implement your logic to decrease the quantity of the item at the given index
+  void _updateQuantity(int index, bool isIncrement) {
+    setState(() {
+      if (isIncrement) {
+        cartItems[index]['quantity']++;
+      } else {
+        if (cartItems[index]['quantity'] > 1) {
+          cartItems[index]['quantity']--;
+        }
+      }
+    });
   }
 
   void _generateReceipt() {
-    // Implement your logic to generate a receipt based on the cartItems
+    if (cartItems.isEmpty) {
+      // Show a button to scan new products
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Cart is Empty'),
+          content: Column(
+            children: [
+              Text('Add products to your cart by scanning them.'),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  // Navigate to the product scanner screen
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProductScannerScreen(),
+                    ),
+                  );
+                },
+                child: Text('Scan New Products'),
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {
+      // Navigate to the ReceiptScreen with the cart items
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ReceiptScreen(cartItems: cartItems.map((item) => item['name'] as String).toList()),
+        ),
+      );
+    }
   }
 
-  void _navigateToReceiptScreen() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ReceiptScreen(cartItems: cartItems),
-      ),
-    );
-  }
-
-  void _scanAnotherProduct() {
-    Navigator.push(
+  void _navigateToProductScannerScreen() {
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (context) => ProductScannerScreen(),
@@ -66,22 +92,36 @@ class _CartScreenState extends State<CartScreen> {
       appBar: AppBar(
         title: Text('My Cart'),
       ),
-      body: ListView.builder(
+      body: cartItems.isEmpty
+          ? Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Your cart is empty.'),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => _navigateToProductScannerScreen(),
+              child: Text('Scan New Products'),
+            ),
+          ],
+        ),
+      )
+          : ListView.builder(
         itemCount: cartItems.length,
         itemBuilder: (context, index) {
           return ListTile(
-            title: Text(cartItems[index]),
+            title: Text(cartItems[index]['name']),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
                   icon: Icon(Icons.remove),
-                  onPressed: () => _decreaseQuantity(index),
+                  onPressed: () => _updateQuantity(index, false),
                 ),
-                Text('1'), // Display the quantity or implement dynamic quantity display
+                Text('${cartItems[index]['quantity']}'),
                 IconButton(
                   icon: Icon(Icons.add),
-                  onPressed: () => _increaseQuantity(),
+                  onPressed: () => _updateQuantity(index, true),
                 ),
                 IconButton(
                   icon: Icon(Icons.delete),
@@ -92,17 +132,19 @@ class _CartScreenState extends State<CartScreen> {
           );
         },
       ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      floatingActionButton: cartItems.isEmpty
+          ? null
+          : Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           FloatingActionButton(
-            onPressed: _scanAnotherProduct,
+            onPressed: () => _navigateToProductScannerScreen(),
             child: Icon(Icons.add),
           ),
+          SizedBox(width: 16),
           FloatingActionButton(
             onPressed: () {
               _generateReceipt();
-              _navigateToReceiptScreen(); // Call the function to navigate to the receipt screen
             },
             child: Icon(Icons.receipt),
           ),
