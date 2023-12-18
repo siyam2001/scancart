@@ -13,7 +13,7 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   List<String> cartItems = [];
-  int quantity=0;
+  int quantity = 0;
 
   @override
   void initState() {
@@ -31,7 +31,6 @@ class _CartScreenState extends State<CartScreen> {
     // Implement your logic to increase the quantity of the item at the given index
     quantity++;
     print("quantity$quantity");
-
   }
 
   void _decreaseQuantity(int index) {
@@ -93,16 +92,17 @@ class _CartScreenState extends State<CartScreen> {
         },
       ),
       floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.center, // Center the buttons
         children: [
           FloatingActionButton(
             onPressed: _scanAnotherProduct,
             child: Icon(Icons.add),
           ),
+          SizedBox(width: 16), // Add some space between the FloatingActionButtons
           FloatingActionButton(
             onPressed: () {
               _generateReceipt();
-              _navigateToReceiptScreen(); // Call the function to navigate to the receipt screen
+              _navigateToReceiptScreen();
             },
             child: Icon(Icons.receipt),
           ),
